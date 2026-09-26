@@ -1,0 +1,75 @@
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+  padding: 20px;
+}
+
+.modal-card {
+  width: 100%;
+  max-width: 360px;
+  background: var(--surface);
+  border-radius: 18px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 30px 60px -20px rgba(15, 23, 42, 0.4);
+}
+
+.modal-card h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.modal-subtitle {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.modal-card input {
+  font-size: 15px;
+  padding: 11px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  outline: none;
+}
+
+.modal-card input:focus {
+  border-color: var(--accent);
+}
+
+.modal-error {
+  background: #fdecec;
+  color: #c0392b;
+  border-radius: 10px;
+  padding: 9px 11px;
+  font-size: 13px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.ghost-button {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 14px;
+  padding: 10px 6px;
+  cursor: pointer;
+}
+
+.ghost-button:hover {
+  color: var(--text);
+}
