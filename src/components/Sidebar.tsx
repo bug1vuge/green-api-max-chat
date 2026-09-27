@@ -1,4 +1,16 @@
+import type { ChatsById, InstanceState } from "../types";
 import "./Sidebar.css";
+
+interface SidebarProps {
+  chats: ChatsById;
+  activeChatId: string | null;
+  onSelectChat: (chatId: string) => void;
+  onOpenNewChat: () => void;
+  onLogout: () => void;
+  idInstance: string;
+  instanceState: InstanceState | null;
+  isConnectionUnstable: boolean;
+}
 
 export default function Sidebar({
   chats,
@@ -7,10 +19,11 @@ export default function Sidebar({
   onOpenNewChat,
   onLogout,
   idInstance,
-}) {
-  const chatList = Object.values(chats).sort(
-    (a, b) => (b.lastMessageAt || 0) - (a.lastMessageAt || 0),
-  );
+  instanceState,
+  isConnectionUnstable,
+}: SidebarProps) {
+  const chatList = Object.values(chats).sort((a, b) => b.lastMessageAt - a.lastMessageAt);
+  const isAuthorized = instanceState === "authorized" || instanceState === null;
 
   return (
     <aside className="sidebar">
@@ -23,6 +36,17 @@ export default function Sidebar({
           ⎋
         </button>
       </div>
+
+      {!isAuthorized && (
+        <div className="status-banner status-banner--warning" role="status">
+          Статус инстанса: {instanceState}
+        </div>
+      )}
+      {isConnectionUnstable && (
+        <div className="status-banner status-banner--info" role="status">
+          Проблемы со связью с GREEN-API, переподключаемся...
+        </div>
+      )}
 
       <button className="new-chat-button" onClick={onOpenNewChat}>
         + Новый чат
@@ -61,12 +85,12 @@ export default function Sidebar({
   );
 }
 
-function initials(label) {
+function initials(label: string): string {
   const digits = String(label || "").replace(/\D/g, "");
   return digits ? digits.slice(-2) : "??";
 }
 
-function previewText(message) {
+function previewText(message: { direction: "in" | "out"; text: string }): string {
   const prefix = message.direction === "out" ? "Вы: " : "";
   return prefix + message.text;
 }

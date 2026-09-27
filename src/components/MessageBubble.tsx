@@ -1,6 +1,12 @@
+import type { ChatMessage } from "../types";
 import "./MessageBubble.css";
 
-export default function MessageBubble({ message }) {
+interface MessageBubbleProps {
+  message: ChatMessage;
+  onRetry?: (message: ChatMessage) => void;
+}
+
+export default function MessageBubble({ message, onRetry }: MessageBubbleProps) {
   const isOut = message.direction === "out";
   const time = new Date(message.timestamp).toLocaleTimeString([], {
     hour: "2-digit",
@@ -16,6 +22,11 @@ export default function MessageBubble({ message }) {
           {isOut && message.status === "sending" && " · отправка…"}
           {isOut && message.status === "error" && " · ошибка"}
         </span>
+        {isOut && message.status === "error" && onRetry && (
+          <button type="button" className="bubble-retry" onClick={() => onRetry(message)}>
+            Повторить отправку
+          </button>
+        )}
       </div>
     </div>
   );

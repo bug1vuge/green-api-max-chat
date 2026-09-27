@@ -46,6 +46,24 @@
   border-color: var(--danger);
 }
 
+.status-banner {
+  margin: 0 18px 12px;
+  border-radius: 10px;
+  padding: 9px 12px;
+  font-size: 12.5px;
+  line-height: 1.4;
+}
+
+.status-banner--warning {
+  background: #fff4e5;
+  color: #a15c00;
+}
+
+.status-banner--info {
+  background: #eaf3ff;
+  color: #0c5bb0;
+}
+
 .new-chat-button {
   margin: 0 18px 12px;
   background: var(--accent);
