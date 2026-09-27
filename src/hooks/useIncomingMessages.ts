@@ -18,7 +18,7 @@ import { deleteNotification, GreenApiError, receiveNotification } from "../api/g
 import type { GreenApiCredentials, IncomingMessageEvent, WebhookBody } from "../types";
 import { withSingleTabLock } from "./useSingleTabLock";
 
-const RECEIVE_TIMEOUT_SEC = 20;
+const RECEIVE_TIMEOUT_SEC = 5;
 const MAX_BACKOFF_MS = 30_000;
 const BASE_BACKOFF_MS = 1_000;
 /** После скольких подряд неудачных попыток показываем баннер о проблемах со связью. */

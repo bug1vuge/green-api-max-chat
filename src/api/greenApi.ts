@@ -52,6 +52,7 @@ function buildUrl(credentials: GreenApiCredentials, method: string): string {
 function classifyHttpStatus(status: number): GreenApiErrorKind {
   if (status === 401 || status === 403) return "auth";
   if (status === 404) return "not_found";
+  if (status === 408) return "timeout";
   if (status === 429) return "rate_limit";
   if (status >= 500) return "server";
   return "unknown";
