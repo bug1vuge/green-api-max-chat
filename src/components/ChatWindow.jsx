@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import { chatIdToPhone } from "../api/greenApi";
 import MessageBubble from "./MessageBubble";
 import "./ChatWindow.css";
 
@@ -22,6 +21,8 @@ export default function ChatWindow({ chat, onSend, isSending, sendError }) {
     );
   }
 
+  const label = chat.title || chat.phone || chat.chatId;
+
   function handleSubmit(event) {
     event.preventDefault();
     const text = draft.trim();
@@ -33,12 +34,12 @@ export default function ChatWindow({ chat, onSend, isSending, sendError }) {
   return (
     <div className="chat-window">
       <header className="chat-window-header">
-        <div className="chat-avatar">{chatIdToPhone(chat.chatId).slice(-2)}</div>
+        <div className="chat-avatar">{String(label).replace(/\D/g, "").slice(-2) || "??"}</div>
         <div>
-          <div className="chat-window-title">
-            {chat.title || chatIdToPhone(chat.chatId)}
+          <div className="chat-window-title">{label}</div>
+          <div className="chat-window-subtitle">
+            {chat.phone ? `+${chat.phone}` : `chatId: ${chat.chatId}`} · MAX
           </div>
-          <div className="chat-window-subtitle">+{chatIdToPhone(chat.chatId)} · MAX</div>
         </div>
       </header>
 

@@ -53,6 +53,7 @@ export function useIncomingMessages(credentials, onMessage) {
       onMessageRef.current?.({
         chatId,
         senderName: body.senderData?.senderName || body.senderData?.chatName,
+        senderPhoneNumber: body.senderData?.senderPhoneNumber,
         text: textMessage,
         idMessage: body.idMessage,
         timestamp: body.timestamp ? body.timestamp * 1000 : Date.now(),

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { GreenApiError, phoneToChatId, sendMessage as apiSendMessage } from "./api/greenApi";
+import { GreenApiError, checkAccount, sendMessage as apiSendMessage } from "./api/greenApi";
 import ChatWindow from "./components/ChatWindow";
 import LoginForm from "./components/LoginForm";
 import NewChatModal from "./components/NewChatModal";
@@ -18,6 +18,8 @@ function ChatApp() {
   const [chats, setChats] = useState(() => loadChats(credentials.idInstance));
   const [activeChatId, setActiveChatId] = useState(null);
   const [isModalOpen, setModalOpen] = useState(false);
+  const [isCheckingAccount, setCheckingAccount] = useState(false);
+  const [checkError, setCheckError] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [sendError, setSendError] = useState("");
 
@@ -26,13 +28,14 @@ function ChatApp() {
   }, [chats, credentials.idInstance]);
 
   // Фоновый long polling входящих сообщений (ReceiveNotification/DeleteNotification)
-  useIncomingMessages(credentials, ({ chatId, senderName, text, idMessage, timestamp }) => {
+  useIncomingMessages(credentials, ({ chatId, senderName, senderPhoneNumber, text, idMessage, timestamp }) => {
     setChats((prev) => {
-      const existing = prev[chatId] ?? createEmptyChat(chatId, senderName);
+      const existing = prev[chatId] ?? createEmptyChat(chatId, senderPhoneNumber, senderName);
       if (existing.messages.some((m) => m.idMessage === idMessage)) return prev; // защита от дублей
       const updated = {
         ...existing,
         title: existing.title || senderName,
+        phone: existing.phone || senderPhoneNumber,
         lastMessageAt: timestamp,
         messages: [
           ...existing.messages,
@@ -43,14 +46,32 @@ function ChatApp() {
     });
   });
 
-  function handleCreateChat(phoneDigits) {
-    const chatId = phoneToChatId(phoneDigits);
-    setChats((prev) => ({
-      ...prev,
-      [chatId]: prev[chatId] ?? createEmptyChat(chatId),
-    }));
-    setActiveChatId(chatId);
-    setModalOpen(false);
+  async function handleCreateChat(phoneDigits) {
+    setCheckError("");
+    setCheckingAccount(true);
+    try {
+      const result = await checkAccount(credentials, phoneDigits);
+      if (!result?.exist) {
+        setCheckError("У этого номера нет аккаунта в мессенджере. Проверьте номер и попробуйте снова.");
+        return;
+      }
+
+      const chatId = String(result.chatId);
+      setChats((prev) => ({
+        ...prev,
+        [chatId]: prev[chatId] ?? createEmptyChat(chatId, result.phoneNumber || phoneDigits),
+      }));
+      setActiveChatId(chatId);
+      setModalOpen(false);
+    } catch (err) {
+      setCheckError(
+        err instanceof GreenApiError
+          ? err.message
+          : "Не удалось проверить номер. Попробуйте ещё раз.",
+      );
+    } finally {
+      setCheckingAccount(false);
+    }
   }
 
   async function handleSend(text) {
@@ -112,14 +133,22 @@ function ChatApp() {
         sendError={sendError}
       />
       {isModalOpen && (
-        <NewChatModal onCreate={handleCreateChat} onClose={() => setModalOpen(false)} />
+        <NewChatModal
+          onCreate={handleCreateChat}
+          onClose={() => {
+            setModalOpen(false);
+            setCheckError("");
+          }}
+          isChecking={isCheckingAccount}
+          error={checkError}
+        />
       )}
     </div>
   );
 }
 
-function createEmptyChat(chatId, title) {
-  return { chatId, title: title || "", messages: [], lastMessageAt: Date.now() };
+function createEmptyChat(chatId, phone, title) {
+  return { chatId, phone: phone || "", title: title || "", messages: [], lastMessageAt: Date.now() };
 }
 
 function appendMessage(chats, chatId, message) {

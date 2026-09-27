@@ -57,17 +57,6 @@ function safeJsonParse(text) {
   }
 }
 
-/** Приводит введённый пользователем номер телефона к chatId вида 79991234567@c.us. */
-export function phoneToChatId(rawPhone) {
-  const digits = rawPhone.replace(/\D/g, "");
-  if (!digits) return null;
-  return `${digits}@c.us`;
-}
-
-export function chatIdToPhone(chatId) {
-  return (chatId || "").replace("@c.us", "").replace("@g.us", "");
-}
-
 /**
  * Проверяет учётные данные и возвращает состояние инстанса.
  * Используется методом GetStateInstance — не требует авторизации WhatsApp/MAX,
@@ -76,6 +65,20 @@ export function chatIdToPhone(chatId) {
 export async function getStateInstance(credentials) {
   const url = buildUrl(credentials, "getStateInstance");
   return request(url, { method: "GET" });
+}
+
+/**
+ * Резолвит настоящий chatId по номеру телефона (обязательно для MAX: там chatId —
+ * непрозрачный числовой идентификатор, а не phoneNumber@c.us, как в WhatsApp).
+ * См. https://green-api.com/v3/docs/api/chat-id/
+ */
+export async function checkAccount(credentials, phoneNumberDigits) {
+  const url = buildUrl(credentials, "checkAccount");
+  return request(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ phoneNumber: Number(phoneNumberDigits) }),
+  });
 }
 
 /** Отправка текстового сообщения. */

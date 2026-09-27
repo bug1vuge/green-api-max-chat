@@ -1,4 +1,3 @@
-import { chatIdToPhone } from "../api/greenApi";
 import "./Sidebar.css";
 
 export default function Sidebar({
@@ -38,18 +37,17 @@ export default function Sidebar({
 
         {chatList.map((chat) => {
           const lastMessage = chat.messages[chat.messages.length - 1];
+          const label = chat.title || chat.phone || chat.chatId;
           return (
             <button
               key={chat.chatId}
               className={`chat-item ${chat.chatId === activeChatId ? "active" : ""}`}
               onClick={() => onSelectChat(chat.chatId)}
             >
-              <div className="chat-avatar">{initials(chat.title)}</div>
+              <div className="chat-avatar">{initials(label)}</div>
               <div className="chat-item-body">
                 <div className="chat-item-top">
-                  <span className="chat-item-title">
-                    {chat.title || chatIdToPhone(chat.chatId)}
-                  </span>
+                  <span className="chat-item-title">{label}</span>
                 </div>
                 <div className="chat-item-preview">
                   {lastMessage ? previewText(lastMessage) : "Нет сообщений"}
@@ -63,8 +61,8 @@ export default function Sidebar({
   );
 }
 
-function initials(title) {
-  const digits = (title || "").replace(/\D/g, "");
+function initials(label) {
+  const digits = String(label || "").replace(/\D/g, "");
   return digits ? digits.slice(-2) : "??";
 }
 
