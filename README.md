@@ -66,7 +66,6 @@ React 19, TypeScript (строгий режим: `strict`, `noUncheckedIndexedAc
 npm install
 npm run dev
 ```
-
 Приложение откроется на `http://localhost:5173`.
 
 Полезные команды:
